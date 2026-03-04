@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import select
+from fastapi import HTTPException
 
 from ...db import get_db
 from ...models import Review, Segment, Score
@@ -16,7 +17,7 @@ def create_review(payload: ReviewCreate, db: Session = Depends(get_db)):
     if seg is None:
         # For MVP you can also auto-create segments; but safer to require it exists
         # to avoid garbage segment_ids.
-        raise ValueError("segment_id not found. Create/seed segments first.")
+         raise HTTPException(status_code=400, detail="segment_id not found. Create/seed segments first.")
 
     r = Review(
         segment_id=payload.segment_id,
