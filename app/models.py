@@ -1,5 +1,8 @@
 from sqlalchemy import String, Float, Integer, DateTime, Boolean, func, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
+from typing import Optional
+from typing import Any
+
 from .db import Base
 
 class Segment(Base):
@@ -46,7 +49,7 @@ class Score(Base):
     hour: Mapped[int] = mapped_column(Integer, index=True)
 
     overall: Mapped[float] = mapped_column(Float, default=0.5)  # 0..1
-    women: Mapped[float | None] = mapped_column(Float, nullable=True)
+    women: Mapped[Any] = mapped_column(Float, nullable=True)
     confidence: Mapped[float] = mapped_column(Float, default=0.2)  # 0..1
     anomaly: Mapped[bool] = mapped_column(Boolean, default=False)
 
