@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .db import engine, Base
-from .api.routes import reviews, scores, segments, safe_points
+from .api.routes import reviews, scores, segments, safe_points,ai
 
 app = FastAPI(title="Safescape Backend")
 
