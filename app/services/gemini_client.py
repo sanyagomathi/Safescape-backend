@@ -1,14 +1,16 @@
 import os
 import requests
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-
 
 def ask_gemini(prompt: str) -> str:
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        raise RuntimeError("GEMINI_API_KEY is not set")
+
     url = (
         "https://generativelanguage.googleapis.com/v1beta/models/"
-        "gemini-1.5-flash:generateContent"
-        f"?key={GEMINI_API_KEY}"
+        "gemini-2.5-flash:generateContent"
+        f"?key={api_key}"
     )
 
     payload = {
@@ -21,11 +23,24 @@ def ask_gemini(prompt: str) -> str:
         ]
     }
 
-    r = requests.post(url, json=payload, timeout=30)
+    response = requests.post(url, json=payload, timeout=30)
 
-    if r.status_code != 200:
-        raise Exception(f"Gemini error: {r.text}")
+    if response.status_code != 200:
+        raise RuntimeError(f"Gemini HTTP {response.status_code}: {response.text}")
 
-    data = r.json()
+    data = response.json()
 
-    return data["candidates"][0]["content"]["parts"][0]["text"]
+    candidates = data.get("candidates")
+    if not candidates:
+        raise RuntimeError(f"No candidates in Gemini response: {data}")
+
+    content = candidates[0].get("content", {})
+    parts = content.get("parts", [])
+    if not parts:
+        raise RuntimeError(f"No parts in Gemini response: {data}")
+
+    text = parts[0].get("text")
+    if not text:
+        raise RuntimeError(f"No text in Gemini response: {data}")
+
+    return text.strip()
